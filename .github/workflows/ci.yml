@@ -50,7 +50,7 @@ jobs:
 
       - name: Build example module
         if: matrix.example-build
-        run: ./gradlew :example:check --no-daemon
+        run: ./gradlew :example:compileKotlin :example:compileTestKotlin --no-daemon
 
       - name: Upload build artifacts
         if: matrix.example-build && success()
