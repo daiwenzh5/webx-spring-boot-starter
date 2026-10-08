@@ -38,3 +38,7 @@ logs/
 
 # Maven local
 .m2/
+
+# Tools output (logs and ad-hoc inspection files)
+tools/repo_listing.json
+tools/inspect_repo.py
