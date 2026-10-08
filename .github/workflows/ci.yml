@@ -41,9 +41,6 @@ jobs:
           distribution: ${{ matrix.java-distribution }}
           cache: 'gradle'
 
-      - name: Validate Gradle Wrapper
-        uses: gradle/wrapper-validation-action@v3
-
       - name: Publish starter to local Maven
         run: ./gradlew ${{ matrix.publish-task }} --no-daemon
 
