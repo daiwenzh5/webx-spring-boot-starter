@@ -20,10 +20,10 @@ dependencies {
     api(libs.kotlin.stdlib)
     api(libs.slf4j.api)
 
-    // @ConfigurationProperties 等注解来自 spring-boot-autoconfigure。
-    // 用 compileOnly 不暴露版本（避免与 sb2/sb3 各自的 SB 版本冲突）；
-    // sb2 / sb3 starter 模块已传递依赖各自的 spring-boot-autoconfigure。
-    compileOnly("org.springframework.boot:spring-boot-autoconfigure")
+    // @ConfigurationProperties / @ConstructorBinding 来自 spring-boot-autoconfigure。
+    // core 编译期需要它们，但运行期由 sb2/sb3 starter 提供（各自 BOM 版本）。
+    // SB 注解 API 在 2.7 与 3.x 之间稳定兼容，所以固定一个 compileOnly 版本即可。
+    compileOnly("org.springframework.boot:spring-boot-autoconfigure:3.3.5")
 
     testImplementation(libs.junit5)
 }
