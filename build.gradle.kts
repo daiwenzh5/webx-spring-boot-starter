@@ -17,6 +17,14 @@ listOf("webx-core", "webx-sb2-starter", "webx-sb3-starter").forEach { moduleName
     project(":$moduleName").apply {
         apply(plugin = "maven-publish")
 
+        extensions.configure(org.gradle.api.publish.PublishingExtension::class.java) {
+            publications {
+                create<MavenPublication>("maven") {
+                    from(components["java"])
+                }
+            }
+        }
+
         afterEvaluate {
             val pub = extensions.getByType(org.gradle.api.publish.PublishingExtension::class.java)
 
