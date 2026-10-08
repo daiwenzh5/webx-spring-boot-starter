@@ -9,7 +9,6 @@ plugins {
 allprojects {
     group = "io.github.daiwenzh5.webx"
     version = (project.findProperty("version") as? String) ?: "0.1.0-SNAPSHOT"
-    // 不在这里声明 repositories；settings.gradle.kts 集中管理并强制使用 settings 仓库
 }
 
 val githubPackagesUrl = "https://maven.pkg.github.com/daiwenzh5/webx-spring-boot-starter"
@@ -33,37 +32,37 @@ listOf("webx-core", "webx-sb2-starter", "webx-sb3-starter").forEach { moduleName
                     if (token != null) setPassword(token)
                 }
             }
-        }
-    }
-}
 
-// 共享 POM 元数据：所有 MavenPublication 自动应用
-allprojects {
-    afterEvaluate {
-        val pub = extensions.findByType(org.gradle.api.publish.PublishingExtension::class.java)
-            ?: return@afterEvaluate
-        pub.publications.withType(org.gradle.api.publish.maven.MavenPublication::class.java).configureEach {
-            pom {
-                name.set(project.name)
-                description.set("Web extension starter for Spring Boot")
-                url.set("https://github.com/daiwenzh5/webx-spring-boot-starter")
-                licenses {
-                    license {
-                        name.set("MIT License")
-                        url.set("https://opensource.org/licenses/MIT")
-                    }
+            // 在所有 publication 上设置 artifactId + POM
+            pub.publications.withType(org.gradle.api.publish.maven.MavenPublication::class.java).configureEach {
+                artifactId = when (project.name) {
+                    "webx-core" -> "webx-core"
+                    "webx-sb2-starter" -> "webx-spring-boot-starter-2"
+                    "webx-sb3-starter" -> "webx-spring-boot-starter"
+                    else -> project.name
                 }
-                developers {
-                    developer {
-                        id.set("daiwenzh5")
-                        name.set("daiwenzh5")
-                        url.set("https://github.com/daiwenzh5")
-                    }
-                }
-                scm {
+                pom {
+                    name.set(project.name)
+                    description.set("Web extension starter for Spring Boot")
                     url.set("https://github.com/daiwenzh5/webx-spring-boot-starter")
-                    connection.set("scm:git:git://github.com/daiwenzh5/webx-spring-boot-starter.git")
-                    developerConnection.set("scm:git:ssh://git@github.com/daiwenzh5/webx-spring-boot-starter.git")
+                    licenses {
+                        license {
+                            name.set("MIT License")
+                            url.set("https://opensource.org/licenses/MIT")
+                        }
+                    }
+                    developers {
+                        developer {
+                            id.set("daiwenzh5")
+                            name.set("daiwenzh5")
+                            url.set("https://github.com/daiwenzh5")
+                        }
+                    }
+                    scm {
+                        url.set("https://github.com/daiwenzh5/webx-spring-boot-starter")
+                        connection.set("scm:git:git://github.com/daiwenzh5/webx-spring-boot-starter.git")
+                        developerConnection.set("scm:git:ssh://git@github.com/daiwenzh5/webx-spring-boot-starter.git")
+                    }
                 }
             }
         }
