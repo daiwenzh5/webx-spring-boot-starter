@@ -1,0 +1,67 @@
+name: Publish
+
+on:
+  push:
+    tags:
+      - 'v*'   # 触发：v0.1.0 / v0.1.0-rc1 等
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '发布版本号（如 0.1.0）'
+        required: true
+        default: '0.1.0-SNAPSHOT'
+
+jobs:
+  publish:
+    name: publish to GitHub Packages
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write     # 创建 GitHub Release 时需要
+      packages: write     # 推送包到 GitHub Packages 必须
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v3
+
+      # 如果是手动触发，覆盖版本号；tag 触发则使用 tag 名（去掉 v 前缀）
+      - name: Resolve version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            VERSION=${GITHUB_REF#refs/tags/v}
+          else
+            VERSION=${{ github.event.inputs.version }}
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Publishing version: $VERSION"
+
+      - name: Publish webx-core
+        run: ./gradlew :webx-core:publish --no-daemon -Pversion=${{ steps.version.outputs.version }}
+
+      - name: Publish webx-sb2-starter
+        run: ./gradlew :webx-sb2-starter:publish --no-daemon -Pversion=${{ steps.version.outputs.version }}
+
+      - name: Publish webx-sb3-starter
+        run: ./gradlew :webx-sb3-starter:publish --no-daemon -Pversion=${{ steps.version.outputs.version }}
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            webx-core/build/libs/*.jar
+            webx-core/build/libs/*.pom
+            webx-sb2-starter/build/libs/*.jar
+            webx-sb2-starter/build/libs/*.pom
+            webx-sb3-starter/build/libs/*.jar
+            webx-sb3-starter/build/libs/*.pom
