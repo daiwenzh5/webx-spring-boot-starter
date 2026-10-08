@@ -3,11 +3,6 @@ package io.github.daiwenzh5.webx.config
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.ConstructorBinding
 
-/**
- * 全局开关。xxx.enabled=true 后所有能力按各自子开关决定是否生效�? *
- * 子模块会各自 @ConfigurationProperties 绑定更细的配置：
- *   webx.response.* / webx.exception.* / webx.logging.* / webx.ratelimit.* / webx.method-override.*
- */
 @ConstructorBinding
 @ConfigurationProperties(prefix = "webx")
 data class WebxProperties(
@@ -20,11 +15,11 @@ data class WebxProperties(
 )
 
 data class ResponseProperties(
-    /** 默认全局包装开关�?*/
+    // Wrap all controller return values into R<T> by default.
     val enabled: Boolean = true,
-    /** 路径白名单：匹配上的请求不包装。Ant 风格�?actuator/**）�?*/
+    // Path whitelist that bypasses wrapping. ANT style.
     val skipPaths: List<String> = DEFAULT_RESPONSE_SKIP_PATHS,
-    /** 路径白名单匹配器类型：ANT（默认）�?REGEX�?*/
+    // Matcher type for skipPaths: ANT or REGEX.
     val skipMatcher: SkipMatcher = SkipMatcher.ANT,
 ) {
     companion object {
@@ -43,34 +38,34 @@ enum class SkipMatcher { ANT, REGEX }
 
 data class ExceptionProperties(
     val enabled: Boolean = true,
-    /** 是否在响应中暴露 stack trace（仅开发环境建�?true）�?*/
+    // Include stack trace info in 500 responses (development only).
     val exposeStackTrace: Boolean = false,
-    /** 是否打印未捕获异常日志�?*/
+    // Log unhandled exceptions.
     val logUnhandled: Boolean = true,
 )
 
 data class LoggingProperties(
     val enabled: Boolean = true,
-    /** 慢请求阈值（毫秒）�?*/
+    // Threshold (ms) above which a request is logged as "slow".
     val slowThresholdMs: Long = 1500L,
-    /** 请求头中透传 traceId 的字段名�?*/
+    // Header used to receive or send TraceId.
     val traceIdHeader: String = "X-Trace-Id",
-    /** 是否在响应头中回�?traceId�?*/
+    // Echo TraceId back to client in response header.
     val echoTraceId: Boolean = true,
 )
 
 data class RateLimitProperties(
     val enabled: Boolean = true,
-    /** 全局默认 QPS�? 表示不限�?*/
+    // Default QPS for rate-limited endpoints. 0 disables.
     val defaultPermitsPerSecond: Double = 0.0,
-    /** 限流命中后返回的错误码�?*/
+    // Error code returned when rate limit is hit.
     val errorCode: Int = 4029,
 )
 
 data class MethodOverrideProperties(
     val enabled: Boolean = true,
-    /** 自定�?header 名称，默�?X-HTTP-Method-Override�?*/
+    // Header name used to override POST method.
     val header: String = "X-HTTP-Method-Override",
-    /** 允许被覆盖的目标 method 集合�?*/
+    // Allowed target HTTP methods.
     val allowed: Set<String> = setOf("GET", "PUT", "DELETE", "PATCH"),
 )
