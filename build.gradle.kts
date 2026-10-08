@@ -1,7 +1,9 @@
 // 根构建脚本：插件版本对齐 + 共享 POM 元数据 + 共享 GitHub Packages 仓库
+//
+// 不在 plugins{} block 里声明 maven-publish：Gradle 8.x 不允许对核心插件 apply false。
+// 改为在需要的子模块通过 apply(plugin = "maven-publish") 启用（见下文）。
 plugins {
     alias(libs.plugins.kotlin.jvm) apply false
-    `maven-publish` apply false
 }
 
 allprojects {
