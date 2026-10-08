@@ -23,6 +23,8 @@ dependencies {
     implementation(platform(libs.springBoot3Bom))
 
     api(libs.springBoot3Autoconfigure)
+    // 提供 HttpMessageConverter / ServerHttpRequest / ResponseBodyAdvice 等
+    api("org.springframework.boot:spring-boot-starter-web")
     api(libs.jakartaServletApi)
 
     api(libs.kotlin.stdlib)
