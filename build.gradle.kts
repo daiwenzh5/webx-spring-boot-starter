@@ -3,7 +3,7 @@
 // 不在 plugins{} block 里声明 maven-publish：Gradle 8.x 不允许对核心插件 apply false。
 // 改为在需要的子模块通过 apply(plugin = "maven-publish") 启用。
 plugins {
-    alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.kotlinJvm) apply false
 }
 
 allprojects {
