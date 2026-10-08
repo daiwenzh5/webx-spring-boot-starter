@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlinJvm)
     `java-library`
 }
 
@@ -18,15 +18,14 @@ kotlin {
 dependencies {
     api(project(":webx-core"))
 
-    implementation(platform(libs.spring.boot.`3-bom`))
+    implementation(platform(libs.springBoot3Bom))
 
-    api(libs.spring.boot.`3-autoconfigure`)
-    api(libs.jakarta.servlet.api)
+    api(libs.springBoot3Autoconfigure)
+    api(libs.jakartaServletApi)
 
     api(libs.kotlin.stdlib)
 
     testImplementation(libs.junit5)
-    testImplementation("org.springframework.boot:spring-boot-starter-web")
 }
 
 publishing {
