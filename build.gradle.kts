@@ -20,11 +20,6 @@ listOf("webx-core", "webx-sb2-starter", "webx-sb3-starter").forEach { moduleName
         afterEvaluate {
             val pub = extensions.getByType(org.gradle.api.publish.PublishingExtension::class.java)
 
-            // 在 afterEvaluate 里创建 publication，确保 java-library plugin 已加载完毕
-            pub.publications.create<MavenPublication>("maven") {
-                from(components["java"])
-            }
-
             pub.repositories.maven {
                 name = "GitHubPackages"
                 url = uri(githubPackagesUrl)
@@ -38,7 +33,7 @@ listOf("webx-core", "webx-sb2-starter", "webx-sb3-starter").forEach { moduleName
                 }
             }
 
-            // 在所有 publication 上设置 artifactId + POM
+            // java-library plugin 已自动创建 "maven" publication；只需 configure
             pub.publications.withType(org.gradle.api.publish.maven.MavenPublication::class.java).configureEach {
                 artifactId = when (project.name) {
                     "webx-core" -> "webx-core"
