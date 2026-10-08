@@ -1,7 +1,6 @@
 // 根构建脚本：插件版本对齐 + 共享 POM 元数据 + 共享 GitHub Packages 仓库
 //
 // 不在 plugins{} block 里声明 maven-publish：Gradle 8.x 不允许对核心插件 apply false。
-// 改为在需要的子模块通过 apply(plugin = "maven-publish") 启用。
 plugins {
     alias(libs.plugins.kotlinJvm) apply false
 }
@@ -13,12 +12,19 @@ allprojects {
 
 val githubPackagesUrl = "https://maven.pkg.github.com/daiwenzh5/webx-spring-boot-starter"
 
-listOf("webx-core", "webx-sb2-starter", "webx-sb3-starter").forEach { moduleName ->
-    project(":$moduleName").apply {
+subprojects {
+    val isPublishable = project.name in setOf("webx-core", "webx-sb2-starter", "webx-sb3-starter")
+
+    if (isPublishable) {
         apply(plugin = "maven-publish")
 
         afterEvaluate {
             val pub = extensions.getByType(org.gradle.api.publish.PublishingExtension::class.java)
+
+            // 创建 publication（在 java-library 已加载后）
+            pub.publications.create<MavenPublication>("maven") {
+                from(components["java"])
+            }
 
             pub.repositories.maven {
                 name = "GitHubPackages"
@@ -33,7 +39,7 @@ listOf("webx-core", "webx-sb2-starter", "webx-sb3-starter").forEach { moduleName
                 }
             }
 
-            // java-library plugin 已自动创建 "maven" publication；只需 configure
+            // 在所有 publication 上设置 artifactId + POM
             pub.publications.withType(org.gradle.api.publish.maven.MavenPublication::class.java).configureEach {
                 artifactId = when (project.name) {
                     "webx-core" -> "webx-core"
