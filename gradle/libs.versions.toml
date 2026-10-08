@@ -1,14 +1,15 @@
 [versions]
 kotlin = "1.9.25"
-# Kotlin 1.9.x 是最后一个对 jvmTarget=1.8 有完整支持的稳定�?
+# Kotlin 1.9.x 是最后一个对 jvmTarget=1.8 有完整支持的稳定线
+
 spring-boot-2 = "2.7.18"
-# 2.7 系列的最后一个版本，仍兼�?javax.servlet
+# 2.7 系列的最后一个版本，仍兼容 javax.servlet
 
 spring-boot-3 = "3.3.5"
-# 3.3 系列的稳定版�?
+# 3.3 系列的稳定版本
+
 slf4j = "1.7.36"
-# 1.7.x �?SB 2.7 的兼容线；SB 3.x 自带 2.x，但 core 仍绑 1.7 兼容两端
-kotlin-logging = "3.0.5"
+# 1.7.x 是 SB 2.7 的兼容线；SB 3.x 自带 2.x，但 core 仍绑 1.7 兼容两端
 
 [libraries]
 # Kotlin
@@ -18,20 +19,20 @@ kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref =
 # Logging facade
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 
-# Spring Boot BOM
-spring-boot-2-bom = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot-2" }
-spring-boot-3-bom = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot-3" }
+# Spring Boot BOM（accessor 名无连字符，避免 backtick）
+springBoot2Bom = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot-2" }
+springBoot3Bom = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot-3" }
 
-# Spring Boot 直接依赖（仅�?starter 模块使用�?spring-boot-2-autoconfigure = { module = "org.springframework.boot:spring-boot-autoconfigure", version.ref = "spring-boot-2" }
-spring-boot-3-autoconfigure = { module = "org.springframework.boot:spring-boot-autoconfigure", version.ref = "spring-boot-3" }
+# Spring Boot 直接依赖（仅 starter 模块使用）
+springBoot2Autoconfigure = { module = "org.springframework.boot:spring-boot-autoconfigure", version.ref = "spring-boot-2" }
+springBoot3Autoconfigure = { module = "org.springframework.boot:spring-boot-autoconfigure", version.ref = "spring-boot-3" }
 
-# servlet API �?starter 模块使用
-javax-servlet-api = { module = "javax.servlet:javax.servlet-api", version = "4.0.1" }
-jakarta-servlet-api = { module = "jakarta.servlet:jakarta.servlet-api", version = "6.0.0" }
+# servlet API 仅 starter 模块使用
+javaxServletApi = { module = "javax.servlet:javax.servlet-api", version = "4.0.1" }
+jakartaServletApi = { module = "jakarta.servlet:jakarta.servlet-api", version = "6.0.0" }
 
 # test
 junit5 = { module = "org.junit.jupiter:junit-jupiter", version = "5.10.3" }
 
 [plugins]
-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
