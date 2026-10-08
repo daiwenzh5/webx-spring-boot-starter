@@ -1,10 +1,10 @@
 plugins {
-    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlinJvm)
     `java-library`
 }
 
 java {
-    // webx-core 是被 sb2/sb3 都引用的最低公共层，必须保�?jvmTarget=1.8
+    // webx-core 是被 sb2/sb3 都引用的最低公共层，必须保持 jvmTarget=1.8
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 }
