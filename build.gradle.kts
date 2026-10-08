@@ -9,10 +9,7 @@ plugins {
 allprojects {
     group = "io.github.daiwenzh5.webx"
     version = (project.findProperty("version") as? String) ?: "0.1.0-SNAPSHOT"
-
-    repositories {
-        mavenCentral()
-    }
+    // 不在这里声明 repositories；settings.gradle.kts 集中管理并强制使用 settings 仓库
 }
 
 val githubPackagesUrl = "https://maven.pkg.github.com/daiwenzh5/webx-spring-boot-starter"
