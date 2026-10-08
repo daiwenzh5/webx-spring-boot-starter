@@ -31,11 +31,3 @@ dependencies {
 
     testImplementation(libs.junit5)
 }
-
-publishing {
-    publications {
-        named<MavenPublication>("maven") {
-            artifactId = "webx-spring-boot-starter-2"
-        }
-    }
-}
