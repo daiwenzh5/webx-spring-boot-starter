@@ -32,7 +32,9 @@ subprojects {
                 credentials {
                     val user: String? = (project.findProperty("gpr.user") as? String)
                         ?: System.getenv("GITHUB_ACTOR")
+                    // 优先 GRADLE_PUBLISH_TOKEN（CI 中是 PAT），其次 GITHUB_TOKEN（本地开发）
                     val token: String? = (project.findProperty("gpr.token") as? String)
+                        ?: System.getenv("GRADLE_PUBLISH_TOKEN")
                         ?: System.getenv("GITHUB_TOKEN")
                     if (user != null) setUsername(user)
                     if (token != null) setPassword(token)
