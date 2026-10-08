@@ -1,1 +1,5 @@
-io.github.daiwenzh5.webx.autoconfigure.WebxAutoConfiguration
+io.github.daiwenzh5.webx.autoconfigure.ResponseWrapperAutoConfiguration
+io.github.daiwenzh5.webx.autoconfigure.GlobalExceptionAutoConfiguration
+io.github.daiwenzh5.webx.autoconfigure.RequestLoggingAutoConfiguration
+io.github.daiwenzh5.webx.autoconfigure.RateLimitAutoConfiguration
+io.github.daiwenzh5.webx.autoconfigure.MethodOverrideAutoConfiguration
