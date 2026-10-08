@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: build (${{ matrix.name }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: jdk8 + spring-boot-2.7
+            java-version: '8'
+            java-distribution: 'temurin'
+            publish-task: ':webx-sb2-starter:publishToMavenLocal'
+            example-build: false
+          - name: jdk17 + spring-boot-3.3
+            java-version: '17'
+            java-distribution: 'temurin'
+            publish-task: ':webx-sb3-starter:publishToMavenLocal'
+            example-build: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: ${{ matrix.java-distribution }}
+          cache: 'gradle'
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v3
+
+      - name: Publish starter to local Maven
+        run: ./gradlew ${{ matrix.publish-task }} --no-daemon
+
+      - name: Static check
+        if: always()
+        run: python3 tools/static_check.py
+
+      - name: Build example module
+        if: matrix.example-build
+        run: ./gradlew :example:check --no-daemon
+
+      - name: Upload build artifacts
+        if: matrix.example-build && success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: example-test-results
+          path: |
+            example/build/test-results/test/*.xml
+            example/build/reports/tests/test/
+          if-no-files-found: ignore
