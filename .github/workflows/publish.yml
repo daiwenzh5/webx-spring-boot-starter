@@ -3,11 +3,11 @@ name: Publish
 on:
   push:
     tags:
-      - 'v*'   # 触发：v0.1.0 / v0.1.0-rc1 等
+      - 'v*'
   workflow_dispatch:
     inputs:
       version:
-        description: '发布版本号（如 0.1.0）'
+        description: 'release version (e.g. 0.1.0)'
         required: true
         default: '0.1.0-SNAPSHOT'
 
@@ -16,8 +16,7 @@ jobs:
     name: publish to GitHub Packages
     runs-on: ubuntu-latest
     permissions:
-      contents: write     # 创建 GitHub Release 时需要
-      packages: write     # 推送包到 GitHub Packages 必须
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -32,7 +31,7 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
 
-      # 如果是手动触发，覆盖版本号；tag 触发则使用 tag 名（去掉 v 前缀）
+      # Resolve version from tag or input
       - name: Resolve version
         id: version
         run: |
@@ -44,14 +43,28 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Publishing version: $VERSION"
 
+      # Use a Personal Access Token (PAT) stored in repo secrets,
+      # because the default GITHUB_TOKEN is read-only for GitHub Packages writes.
       - name: Publish webx-core
         run: ./gradlew :webx-core:publish --no-daemon -Pversion=${{ steps.version.outputs.version }}
+        env:
+          GITHUB_ACTOR: daiwenzh5
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GRADLE_PUBLISH_TOKEN: ${{ secrets.PAT_TOKEN }}
 
       - name: Publish webx-sb2-starter
         run: ./gradlew :webx-sb2-starter:publish --no-daemon -Pversion=${{ steps.version.outputs.version }}
+        env:
+          GITHUB_ACTOR: daiwenzh5
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GRADLE_PUBLISH_TOKEN: ${{ secrets.PAT_TOKEN }}
 
       - name: Publish webx-sb3-starter
         run: ./gradlew :webx-sb3-starter:publish --no-daemon -Pversion=${{ steps.version.outputs.version }}
+        env:
+          GITHUB_ACTOR: daiwenzh5
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GRADLE_PUBLISH_TOKEN: ${{ secrets.PAT_TOKEN }}
 
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/v')
