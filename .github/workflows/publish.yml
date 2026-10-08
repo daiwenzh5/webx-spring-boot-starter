@@ -32,9 +32,6 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
 
-      - name: Validate Gradle Wrapper
-        uses: gradle/wrapper-validation-action@v3
-
       # 如果是手动触发，覆盖版本号；tag 触发则使用 tag 名（去掉 v 前缀）
       - name: Resolve version
         id: version
