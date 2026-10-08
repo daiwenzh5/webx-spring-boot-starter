@@ -1,10 +1,8 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotlin.kapt)
     id("org.springframework.boot") version "3.3.5"
+    id("io.spring.dependency-management") version "1.1.6"
 }
-
-apply(plugin = "io.spring.dependency-management")
 
 group = "io.github.daiwenzh5.webx.example"
 version = "0.1.0-SNAPSHOT"
@@ -22,7 +20,6 @@ kotlin {
 }
 
 dependencies {
-    // 通过模块引用直接消费本地 starter，避免发布后才能跑测试
     implementation(project(":webx-sb3-starter"))
 
     implementation("org.springframework.boot:spring-boot-starter-web")
