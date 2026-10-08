@@ -6,14 +6,18 @@ webx-spring-boot-starter 静态检查脚本。
   3. starter 模块的 META-INF 注册文件存在
   4. 没有遗留 com.example.webx 占位符
   5. javax.servlet 只在 sb2 模块；jakarta.servlet 只在 sb3 模块
+  6. GitHub Actions workflow 结构合法
+  7. 根 build.gradle.kts 引用 maven-publish 插件
+
+路径解析：优先用命令行参数 --root，其次环境变量 WEBX_ROOT，否则用脚本所在目录的父级。
 """
 from __future__ import annotations
 
+import argparse
+import os
 import re
 import sys
 from pathlib import Path
-
-ROOT = Path(r"C:\NoneDrive\Agents\Mimo\web toolkit\webx-spring-boot-starter")
 
 errors: list[str] = []
 warnings: list[str] = []
@@ -45,6 +49,22 @@ def safe_read(f: Path) -> str | None:
             continue
     return None
 
+
+def resolve_root() -> Path:
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("--root", type=str, default=None)
+    args, _ = parser.parse_known_args()
+
+    if args.root:
+        return Path(args.root).resolve()
+    if os.environ.get("WEBX_ROOT"):
+        return Path(os.environ["WEBX_ROOT"]).resolve()
+    # 默认：本脚本所在目录的父级（项目根）
+    return Path(__file__).resolve().parent.parent
+
+
+ROOT = resolve_root()
+print(f"Project root: {ROOT}\n")
 
 # ---------------------------------------------------------------------------
 section("1. Package/directory consistency")
@@ -118,15 +138,19 @@ for sb_dir, forbidden, expected in [
 # ---------------------------------------------------------------------------
 section("4. settings.gradle.kts modules")
 
-settings = safe_read(ROOT / "settings.gradle.kts") or ""
-module_re = re.compile(r'include\(["\']:([\w\-]+)["\']\)')
-modules = module_re.findall(settings)
-for m in modules:
-    build_file = ROOT / m / "build.gradle.kts"
-    if not build_file.exists():
-        err(f"module :{m} listed but {build_file.relative_to(ROOT)} missing")
-    else:
-        ok(f"module :{m} -> {build_file.relative_to(ROOT)}")
+settings_path = ROOT / "settings.gradle.kts"
+if not settings_path.exists():
+    err(f"settings.gradle.kts missing at {settings_path}")
+else:
+    settings = safe_read(settings_path) or ""
+    module_re = re.compile(r'include\(["\']:([\w\-]+)["\']\)')
+    modules = module_re.findall(settings)
+    for m in modules:
+        build_file = ROOT / m / "build.gradle.kts"
+        if not build_file.exists():
+            err(f"module :{m} listed but {build_file.relative_to(ROOT)} missing")
+        else:
+            ok(f"module :{m} -> {build_file.relative_to(ROOT)}")
 
 
 # ---------------------------------------------------------------------------
@@ -158,19 +182,19 @@ workflows_dir = ROOT / ".github" / "workflows"
 if not workflows_dir.exists():
     warn(".github/workflows/ directory missing")
 else:
-    for wf in sorted(workflows_dir.glob("*.yml")) + sorted(workflows_dir.glob("*.yaml")):
+    wf_files = sorted(workflows_dir.glob("*.yml")) + sorted(workflows_dir.glob("*.yaml"))
+    for wf in wf_files:
         text = safe_read(wf)
         if text is None:
             err(f"{wf.relative_to(ROOT)}: cannot decode")
             continue
-        # 粗略校验：必须包含 jobs + steps
         if "jobs:" not in text or "steps:" not in text:
             err(f"{wf.relative_to(ROOT)}: missing jobs or steps")
         else:
             ok(f"{wf.relative_to(ROOT)}: structure valid")
 
     expected_workflows = {"ci.yml", "publish.yml"}
-    actual = {wf.name for wf in workflows_dir.glob("*.yml")}
+    actual = {wf.name for wf in wf_files}
     missing = expected_workflows - actual
     for m in missing:
         warn(f"recommended workflow missing: {m}")
@@ -179,15 +203,13 @@ else:
 # ---------------------------------------------------------------------------
 section("7. Build scripts reference correct plugin ids")
 
-for gradle_kts in ROOT.rglob("build.gradle.kts"):
-    text = safe_read(gradle_kts) or ""
-    # 在新版中我们用 `maven-publish` apply false 在根，子模块不再写。
-    # 此检查确保根 build 仍然声明 maven-publish 插件（哪怕 apply false）
-    if gradle_kts == ROOT / "build.gradle.kts":
-        if "`maven-publish` apply false" not in text and "maven-publish" not in text:
-            err("root build.gradle.kts does not reference maven-publish plugin")
-        else:
-            ok("root build.gradle.kts: maven-publish plugin reference present")
+root_build = ROOT / "build.gradle.kts"
+if root_build.exists():
+    text = safe_read(root_build) or ""
+    if "maven-publish" not in text:
+        err("root build.gradle.kts does not reference maven-publish plugin")
+    else:
+        ok("root build.gradle.kts: maven-publish plugin reference present")
 
 
 # ---------------------------------------------------------------------------
