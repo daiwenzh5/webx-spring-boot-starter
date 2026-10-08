@@ -24,6 +24,8 @@ dependencies {
     implementation(platform(libs.springBoot2Bom))
 
     api(libs.springBoot2Autoconfigure)
+    // 提供 HttpMessageConverter / ServerHttpRequest / ResponseBodyAdvice 等
+    api("org.springframework.boot:spring-boot-starter-web")
     api(libs.javaxServletApi)
 
     // 运行时传递 kotlin-stdlib，业务项目无需显式声明
