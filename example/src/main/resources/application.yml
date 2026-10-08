@@ -1,0 +1,22 @@
+server:
+  port: 8080
+
+webx:
+  enabled: true
+  response:
+    enabled: true
+  exception:
+    enabled: true
+    expose-stack-trace: true   # demo 才开
+  logging:
+    enabled: true
+    slow-threshold-ms: 1500
+  ratelimit:
+    enabled: true
+  method-override:
+    enabled: true
+
+logging:
+  level:
+    root: INFO
+    io.github.daiwenzh5.webx: DEBUG
